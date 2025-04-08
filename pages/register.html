@@ -13,21 +13,25 @@
             <form id="registerForm">
                 <div class="form-group">
                     <label for="name">Họ tên</label>
-                    <input type="text" id="name" name="name" required>
+                    <input type="text" id="name" name="name">
+                    <div class="error-message" id="nameError" style="display: none;"></div>
                 </div>
                 <div class="form-group">
                     <label for="email">Email</label>
-                    <input type="email" id="email" name="email" required>
+                    <input type="email" id="email" name="email">
+                    <div class="error-message" id="emailError" style="display: none;"></div>
                 </div>
                 <div class="form-group">
                     <label for="password">Mật khẩu</label>
-                    <input type="password" id="password" name="password" required>
+                    <input type="password" id="password" name="password">
+                    <div class="error-message" id="passwordError" style="display: none;"></div>
                 </div>
                 <div class="form-group">
                     <label for="confirmPassword">Xác nhận mật khẩu</label>
-                    <input type="password" id="confirmPassword" name="confirmPassword" required>
+                    <input type="password" id="confirmPassword" name="confirmPassword">
+                    <div class="error-message" id="confirmPasswordError" style="display: none;"></div>
                 </div>
-                <div class="error-message" style="display: none; color: red; margin-bottom: 10px;"></div>
+                <div class="error-message" id="registerError" style="display: none; color: red; margin-bottom: 10px;"></div>
                 <button type="submit">Đăng ký</button>
             </form>
             <p class="auth-link">Đã có tài khoản? <a href="./login.html">Đăng nhập</a></p>
@@ -43,20 +47,79 @@
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
             const confirmPassword = document.getElementById('confirmPassword').value;
-            const errorMessage = document.querySelector('.error-message');
             
-            if (password !== confirmPassword) {
-                errorMessage.textContent = 'Mật khẩu xác nhận không khớp';
-                errorMessage.style.display = 'block';
+            const nameError = document.getElementById('nameError');
+            const emailError = document.getElementById('emailError');
+            const passwordError = document.getElementById('passwordError');
+            const confirmPasswordError = document.getElementById('confirmPasswordError');
+            const registerError = document.getElementById('registerError');
+            
+            // Reset all error messages
+            nameError.style.display = 'none';
+            nameError.textContent = '';
+            emailError.style.display = 'none';
+            emailError.textContent = '';
+            passwordError.style.display = 'none';
+            passwordError.textContent = '';
+            confirmPasswordError.style.display = 'none';
+            confirmPasswordError.textContent = '';
+            registerError.style.display = 'none';
+            registerError.textContent = '';
+            
+            // Validate name
+            if (!name) {
+                nameError.textContent = 'Vui lòng nhập họ tên';
+                nameError.style.display = 'block';
                 return;
             }
             
-            if (register(email, password, name)) {
+            // Validate email
+            if (!email) {
+                emailError.textContent = 'Vui lòng nhập email';
+                emailError.style.display = 'block';
+                return;
+            }
+            
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
+                emailError.textContent = 'Email không đúng định dạng';
+                emailError.style.display = 'block';
+                return;
+            }
+            
+            // Validate password
+            if (!password) {
+                passwordError.textContent = 'Vui lòng nhập mật khẩu';
+                passwordError.style.display = 'block';
+                return;
+            }
+            
+            if (password.length < 8) {
+                passwordError.textContent = 'Mật khẩu phải có ít nhất 8 ký tự';
+                passwordError.style.display = 'block';
+                return;
+            }
+            
+            // Validate confirm password
+            if (!confirmPassword) {
+                confirmPasswordError.textContent = 'Vui lòng xác nhận mật khẩu';
+                confirmPasswordError.style.display = 'block';
+                return;
+            }
+            
+            if (password !== confirmPassword) {
+                confirmPasswordError.textContent = 'Mật khẩu xác nhận không khớp';
+                confirmPasswordError.style.display = 'block';
+                return;
+            }
+            
+            // Check registration
+            if (typeof register === 'function' && register(email, password, name)) {
                 alert('Đăng ký thành công! Vui lòng đăng nhập.');
-                window.location.href = './project-manager.html';
+                window.location.href = './login.html';
             } else {
-                errorMessage.textContent = 'Email đã tồn tại';
-                errorMessage.style.display = 'block';
+                registerError.textContent = 'Email đã tồn tại';
+                registerError.style.display = 'block';
             }
         });
     </script>

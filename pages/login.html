@@ -13,13 +13,15 @@
             <form id="loginForm">
                 <div class="form-group">
                     <label for="email">Email</label>
-                    <input type="email" id="email" name="email" required>
+                    <input type="email" id="email" name="email">
+                    <div class="error-message" id="emailError" style="display: none;"></div>
                 </div>
                 <div class="form-group">
                     <label for="password">Mật khẩu</label>
-                    <input type="password" id="password" name="password" required>
+                    <input type="password" id="password" name="password">
+                    <div class="error-message" id="passwordError" style="display: none;"></div>
                 </div>
-                <div class="error-message" style="display: none; color: red; margin-bottom: 10px;"></div>
+                <div class="error-message" id="loginError" style="display: none; color: red; margin-bottom: 10px;"></div>
                 <button type="submit">Đăng nhập</button>
             </form>
             <p class="auth-link">Chưa có tài khoản? <a href="register.html">Đăng ký ngay</a></p>
@@ -33,13 +35,51 @@
             
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
-            const errorMessage = document.querySelector('.error-message');
+            const emailError = document.getElementById('emailError');
+            const passwordError = document.getElementById('passwordError');
+            const loginError = document.getElementById('loginError');
             
-            if (login(email, password)) {
+            // Reset all error messages
+            emailError.style.display = 'none';
+            emailError.textContent = '';
+            passwordError.style.display = 'none';
+            passwordError.textContent = '';
+            loginError.style.display = 'none';
+            loginError.textContent = '';
+            
+            // Validate email
+            if (!email) {
+                emailError.textContent = 'Vui lòng nhập email';
+                emailError.style.display = 'block';
+                return;
+            }
+            
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
+                emailError.textContent = 'Email không đúng định dạng';
+                emailError.style.display = 'block';
+                return;
+            }
+            
+            // Validate password
+            if (!password) {
+                passwordError.textContent = 'Vui lòng nhập mật khẩu';
+                passwordError.style.display = 'block';
+                return;
+            }
+            
+            if (password.length < 8) {
+                passwordError.textContent = 'Mật khẩu phải có ít nhất 8 ký tự';
+                passwordError.style.display = 'block';
+                return;
+            }
+            
+            // Check login credentials
+            if (typeof login === 'function' && login(email, password)) {
                 window.location.href = './project-manager.html';
             } else {
-                errorMessage.textContent = 'Email hoặc mật khẩu không đúng';
-                errorMessage.style.display = 'block';
+                loginError.textContent = 'Email hoặc mật khẩu không đúng';
+                loginError.style.display = 'block';
             }
         });
     </script>

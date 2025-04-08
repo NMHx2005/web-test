@@ -556,3 +556,44 @@ body {
     background: var(--delete-color);
     color: white;
 }
+
+
+/* Cột tiến độ (progress) */
+.status-tag.đúng-tiến {
+    background-color: #28a745; /* Xanh lá */
+    color: white;
+    padding: 2px 8px;
+    border-radius: 4px;
+}
+.status-tag.có-rủi {
+    background-color: #ffc107; /* Vàng */
+    color: black;
+    padding: 2px 8px;
+    border-radius: 4px;
+}
+.status-tag.trì-hoãn {
+    background-color: #dc3545; /* Đỏ */
+    color: white;
+    padding: 2px 8px;
+    border-radius: 4px;
+}
+
+/* Cột ưu tiên (priority) */
+.priority-tag.thấp {
+    background-color: #007bff; /* Xanh dương */
+    color: white;
+    padding: 2px 8px;
+    border-radius: 4px;
+}
+.priority-tag.trung-bình {
+    background-color: #fd7e14; /* Cam */
+    color: white;
+    padding: 2px 8px;
+    border-radius: 4px;
+}
+.priority-tag.cao {
+    background-color: #dc3545; /* Đỏ */
+    color: white;
+    padding: 2px 8px;
+    border-radius: 4px;
+}

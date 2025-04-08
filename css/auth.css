@@ -93,4 +93,5 @@ button:hover {
     border-radius: 4px;
     margin-bottom: 15px;
     color: #cc0000;
+    display: none;
 } 

@@ -62,6 +62,57 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     // --- Render danh sách nhiệm vụ ---
+    // function renderTasks() {
+    //     const tasks = JSON.parse(localStorage.getItem('tasks')) || {};
+    //     const projectTasks = tasks[projectId] || [];
+    //     const tbody = document.querySelector('.task-table tbody');
+    //     if (!tbody) {
+    //         console.error("Không tìm thấy tbody trong .task-table");
+    //         return;
+    //     }
+
+    //     tbody.innerHTML = '';
+    //     const groups = ["to-do", "in-progress", "pending", "done"];
+    //     groups.forEach(group => {
+    //         const groupTasks = projectTasks.filter(task => task.status.toLowerCase().replace(" ", "-") === group);
+    //         tbody.innerHTML += `
+    //             <tr class="group-header collapsible ${group !== 'to-do' ? 'collapsed' : ''}" data-group="${group}">
+    //                 <td colspan="7"><span class="group-title">${group.replace("-", " ").replace(/\b\w/g, l => l.toUpperCase())}</span></td>
+    //             </tr>
+    //             ${groupTasks.map(task => `
+    //                 <tr class="task-row ${group} ${group === 'to-do' ? 'visible' : ''}">
+    //                     <td>${task.name}</td>
+    //                     <td>${task.assignee}</td>
+    //                     <td><span class="priority-tag ${task.priority.toLowerCase().replace(" ", "-")}">${task.priority}</span></td>
+    //                     <td>${task.startDate.slice(5)}</td>
+    //                     <td>${task.dueDate.slice(5)}</td>
+    //                     <td><span class="status-tag ${task.progress.toLowerCase().replace(" ", "-")}">${task.progress}</span></td>
+    //                     <td>
+    //                         <div class="action-buttons">
+    //                             <button class="btn-edit" data-id="${task.id}">Sửa</button>
+    //                             <button class="btn-delete" data-id="${task.id}">Xóa</button>
+    //                         </div>
+    //                     </td>
+    //                 </tr>
+    //             `).join('')}
+    //         `;
+    //     });
+
+    //     document.querySelectorAll('.btn-edit').forEach(button => {
+    //         button.addEventListener('click', () => editTask(parseInt(button.getAttribute('data-id'))));
+    //     });
+    //     document.querySelectorAll('.btn-delete').forEach(button => {
+    //         button.addEventListener('click', () => deleteTask(parseInt(button.getAttribute('data-id'))));
+    //     });
+    //     document.querySelectorAll(".group-header.collapsible").forEach(header => {
+    //         header.addEventListener("click", function () {
+    //             const group = this.getAttribute("data-group");
+    //             const tasks = document.querySelectorAll(`.task-row.${group}`);
+    //             this.classList.toggle("collapsed");
+    //             tasks.forEach(task => task.classList.toggle("visible"));
+    //         });
+    //     });
+    // }
     function renderTasks() {
         const tasks = JSON.parse(localStorage.getItem('tasks')) || {};
         const projectTasks = tasks[projectId] || [];

@@ -4,7 +4,7 @@ function initializeAuth() {
     if (users.length === 0) {
         users.push({
             email: 'admin@gmail.com',
-            password: '12345',
+            password: '12345678',
             name: 'Admin',
             role: 'admin'
         });
