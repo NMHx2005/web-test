@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chi tiết dự án</title>
+    <link rel="stylesheet" href="../css/modal.css">
+    <link rel="stylesheet" href="../css/project-detail.css">
+</head>
+<body>
+    <div class="overlay" id="overlay"></div>
+    <header class="main-header">
+        <div class="header-left">
+            <a href="./project-manager.html">
+                <h1>Quản Lý Dự Án</h1>
+            </a>
+        </div>
+        <div class="header-right">
+            <nav>
+                <ul>
+                    <li><a href="project-manager.html">Dự Án</a></li>
+                    <li><a href="./personal-tasks.html">Nhiệm Vụ của tôi</a></li>
+                    <li><a href="login.html" onclick="logout(); return false;">Đăng Xuất</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <div class="project-detail-header">
+            <div class="project-header">
+                <div>
+                    <h1 class="project-title">Dự án không tồn tại</h1>
+                    <p class="project-description">Không có mô tả</p>
+                </div>
+            </div>
+
+            <section class="member-section">
+                <div class="member-header">
+                    <h2 class="member-title">Thành viên</h2>
+                    <button class="add-member-btn">+ Thêm thành viên</button>
+                </div>
+                <div class="member-list">
+                    <div class="member-item">
+                        <div class="member-avatar blue">AN</div>
+                        <div class="member-info">
+                            <span class="member-name">An Nguyễn</span>
+                            <span class="member-role">Project owner</span>
+                        </div>
+                    </div>
+                    <div class="member-item">
+                        <div class="member-avatar purple">BA</div>
+                        <div class="member-info">
+                            <span class="member-name">Bách Nguyễn</span>
+                            <span class="member-role">Frontend developer</span>
+                        </div>
+                    </div>
+                    <div class="list__member">
+                        <img alt="" src="../assets/images/icon_ba_cham.png" />
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <div class="task-header">
+            <div class="task-actions">
+                <button class="add-task-btn">+ Thêm nhiệm vụ</button>
+                <div class="task-actions-right">
+                    <div class="sort-dropdown">
+                        <select class="sort-btn">
+                            <option value="">Sắp xếp theo</option>
+                            <option value="start-date">Ngày bắt đầu</option>
+                            <option value="progress">Tiến độ</option>
+                        </select>
+                    </div>
+                    <div class="search-box">
+                        <input type="text" placeholder="Tìm kiếm nhiệm vụ">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <section class="task-section">
+            <div class="task-title">Danh Sách Nhiệm Vụ</div>
+            <div class="task-group">
+                <table class="task-table">
+                    <thead>
+                        <tr>
+                            <th>Tên Nhiệm Vụ</th>
+                            <th>Người Phụ Trách</th>
+                            <th>Ưu Tiên</th>
+                            <th>Ngày Bắt Đầu</th>
+                            <th>Hạn Chót</th>
+                            <th>Tiến độ</th>
+                            <th>Hành động</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Dữ liệu nhiệm vụ sẽ được render động -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+
+    <footer class="main-footer">
+        <p>© 2025 Quản Lý Dự Án Nhóm. All rights reserved.</p>
+    </footer>
+
+    <div class="modal__member">
+        <div class="modal__member-header">
+            <h2>Thêm thành viên</h2>
+            <span class="close">×</span>
+        </div>
+        <form>
+            <div class="modal__member-body">
+                <label for="member-name">Tên thành viên</label>
+                <input name="member-name" type="text" id="member-name" placeholder="Vui lòng nhập tên thành viên mới ...">
+                <label for="member-role">Vai trò</label>
+                <input name="member-role" type="text" id="member-role" placeholder="Vai trò của thành viên">
+            </div>
+            <div class="modal__member-footer">
+                <button type="button" class="cancel">Huỷ</button>
+                <button type="submit" class="save">Lưu</button>
+            </div>
+        </form>
+    </div>
+
+    <div class="modal__member_list">
+        <div class="modal__member_list-content">
+            <div class="modal__member_list-header">
+                <h2>Danh sách thành viên</h2>
+                <span class="close">×</span>
+            </div>
+            <div class="modal__member_list-body">
+                <!-- Nội dung sẽ được thêm bởi JavaScript -->
+            </div>
+        </div>
+    </div>
+
+    <div class="modal__task" id="taskModal">
+        <div class="modal__task-content">
+            <div class="modal__task-header">
+                <h2>Thêm nhiệm vụ</h2>
+                <span class="close">×</span>
+            </div>
+            <form id="addTaskForm">
+                <div class="modal__task-body">
+                    <label for="task-name">Tên nhiệm vụ</label>
+                    <input type="text" id="task-name" name="task-name" required>
+
+                    <label for="assignee">Người phụ trách</label>
+                    <select id="assignee" name="assignee" required>
+                        <option value="An Nguyễn">An Nguyễn</option>
+                        <option value="Bách Nguyễn">Bách Nguyễn</option>
+                    </select>
+
+                    <label for="status">Trạng thái</label>
+                    <select id="status" name="status" required>
+                        <option value="To do">To do</option>
+                        <option value="In Progress">In Progress</option>
+                        <option value="Pending">Pending</option>
+                        <option value="Done">Done</option>
+                    </select>
+
+                    <label for="start-date">Ngày bắt đầu</label>
+                    <input type="date" id="start-date" name="start-date" required>
+
+                    <label for="end-date">Hạn cuối</label>
+                    <input type="date" id="end-date" name="due-date" required>
+
+                    <label for="priority">Độ ưu tiên</label>
+                    <select id="priority" name="priority" required>
+                        <option value="Thấp">Thấp</option>
+                        <option value="Trung Bình">Trung Bình</option>
+                        <option value="Cao">Cao</option>
+                    </select>
+
+                    <label for="progress">Tiến độ</label>
+                    <select id="progress" name="progress" required>
+                        <option value="Đúng tiến độ">Đúng Tiến Độ</option>
+                        <option value="Có rủi ro">Có Rủi Ro</option>
+                        <option value="Trì hoãn">Trì Hoãn</option>
+                    </select>
+                </div>
+                <div class="modal__task-footer">
+                    <button type="button" class="cancel">Hủy</button>
+                    <button type="submit" class="save">Lưu</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <script src="../js/product-detail.js"></script>
+    <script src="../js/auth.js"></script>
+</body>
+</html>

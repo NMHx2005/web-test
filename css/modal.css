@@ -1,0 +1,503 @@
+body {
+    position: relative;
+}
+
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5); /* Màu đen với độ trong suốt 50% */
+    display: none; /* Ẩn mặc định */
+    z-index: 998; /* Nằm dưới modal nhưng trên các phần tử khác */
+    transition: opacity 0.3s ease; /* Hiệu ứng mờ dần */
+    opacity: 0;
+}
+
+.overlay.active {
+    display: block;
+    opacity: 1;
+}
+
+/* Điều chỉnh z-index của modal để nằm trên overlay */
+.modal {
+    z-index: 1000;
+}
+
+.model__delete {
+    z-index: 1000;
+}
+
+.modal__task,
+.modal__member,
+.modal__member_list {
+    z-index: 1000;
+}
+
+.modal {
+    display: none;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    width: 400px;
+    max-width: 90%;
+    padding: 20px;
+    box-sizing: border-box;
+    position: fixed;
+    top: 33px;
+    left: 50%;
+    transform: translateX(-50%);
+}
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #e0e0e0;
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+}
+.modal-header h2 {
+    font-size: 18px;
+    margin: 0;
+}
+.modal-header .close {
+    font-size: 20px;
+    cursor: pointer;
+}
+.modal-body {
+    margin-bottom: 20px;
+}
+.modal-body label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+.modal-body input[type="text"],
+.modal-body textarea {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+.modal-body input[type="text"].error {
+    border-color: red;
+}
+.modal-body .error-message {
+    color: red;
+    font-size: 12px;
+    margin-top: -10px;
+    margin-bottom: 10px;
+}
+.modal-footer {
+    display: flex;
+    justify-content: flex-end;
+}
+.modal-footer button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+}
+.modal-footer .cancel {
+    background-color: #6c757d;
+    color: white;
+    margin-right: 10px;
+}
+.modal-footer .save {
+    background-color: #007bff;
+    color: white;
+}
+input, textarea {
+    outline: none;
+}
+
+@media (max-width: 640px) {
+    .modal-container {
+        top: 50%;
+        transform: translate(-50%, -50%);
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+.model__delete {
+    background-color: white;
+    display: none;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    width: 400px;
+    max-width: 90%;
+     position: fixed;
+    top: 33px;
+    left: 50%;
+    transform: translateX(-50%);
+}
+.model__delete-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px;
+    border-bottom: 1px solid #e0e0e0;
+}
+.model__delete-header h2 {
+    margin: 0;
+    font-size: 18px;
+}
+.model__delete-header .close {
+    font-size: 20px;
+    cursor: pointer;
+}
+.model__delete-body {
+    padding: 16px;
+    font-size: 16px;
+}
+.model__delete-footer {
+    display: flex;
+    justify-content: flex-end;
+    padding: 16px;
+    border-top: 1px solid #e0e0e0;
+}
+.model__delete-footer button {
+    padding: 8px 16px;
+    font-size: 14px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+.model__delete-footer .cancel-btn {
+    background-color: #6c757d;
+    color: white;
+    margin-right: 8px;
+}
+.model__delete-footer .delete-btn {
+    background-color: #dc3545;
+    color: white;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* Modal thêm thành viên mới */
+.modal__member {
+    background-color: white;
+    display: none;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    width: 400px;
+    max-width: 90%;
+    padding: 20px;
+    box-sizing: border-box;
+    position: fixed;
+    top: 33px;
+    left: 50%;
+    transform: translateX(-50%);
+}
+.modal__member-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #e0e0e0;
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+}
+.modal__member-header h2 {
+    margin: 0;
+    font-size: 20px;
+}
+.modal__member-header .close {
+    font-size: 20px;
+    cursor: pointer;
+}
+.modal__member-body {
+    margin-bottom: 20px;
+}
+.modal__member-body label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+.modal__member-body input[type="text"],
+.modal__member-body input[type="email"] {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+.modal__member-body input[type="email"].error {
+    border-color: #d32f2f;
+}
+.modal__member-body .error-message {
+    color: #d32f2f;
+    font-size: 12px;
+    margin-top: -10px;
+    margin-bottom: 10px;
+}
+.modal__member-footer {
+    display: flex;
+    justify-content: flex-end;
+}
+.modal__member-footer button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+}
+.modal__member-footer .cancel {
+    background-color: #9e9e9e;
+    color: white;
+    margin-right: 10px;
+}
+.modal__member-footer .save {
+    background-color: #1a73e8;
+    color: white;
+}
+
+/* Thêm styles cho modal danh sách thành viên */
+.modal__member_list {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+}
+
+.modal__member_list-content {
+    position: relative;
+    background-color: #fff;
+    margin: 10% auto;
+    padding: 0;
+    width: 50%;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.modal__member_list-header {
+    padding: 20px;
+    border-bottom: 1px solid #e0e0e0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.modal__member_list-header h2 {
+    margin: 0;
+    font-size: 1.25rem;
+    color: #333;
+}
+
+.modal__member_list-body {
+    padding: 20px;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.modal__member_list .member-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.modal__member_list .member-table th,
+.modal__member_list .member-table td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.modal__member_list .member-table th {
+    background-color: #f8f9fa;
+    font-weight: 600;
+}
+
+.modal__member_list .member-table tr:hover {
+    background-color: #f5f5f5;
+}
+
+.modal__member_list .no-members {
+    text-align: center;
+    color: #666;
+    padding: 20px;
+}
+
+.modal__member_list .close {
+    cursor: pointer;
+    font-size: 24px;
+    color: #666;
+}
+
+.modal__member_list .close:hover {
+    color: #333;
+}
+
+
+
+
+
+
+
+
+.modal__status {
+    display: none;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    width: 400px;
+    max-width: 90%;
+    position: fixed;
+    top: 33px;
+    left: 50%;
+    transform: translateX(-50%);
+}
+.modal__status-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px;
+    border-bottom: 1px solid #e0e0e0;
+}
+.modal__status-header h2 {
+    margin: 0;
+    font-size: 18px;
+}
+.modal__status-header .close {
+    font-size: 18px;
+    cursor: pointer;
+}
+.modal__status-body {
+    padding: 16px;
+    font-size: 14px;
+    color: #333;
+}
+.modal__status-footer {
+    display: flex;
+    justify-content: flex-end;
+    padding: 16px;
+    border-top: 1px solid #e0e0e0;
+}
+.modal__status-footer button {
+    padding: 8px 16px;
+    font-size: 14px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+.modal__status-footer .cancel {
+    background-color: #e0e0e0;
+    color: #333;
+    margin-right: 8px;
+}
+.modal__status-footer .confirm {
+    background-color: #1a73e8;
+    color: white;
+}
+
+
+
+
+.modal__task {
+    background-color: white;
+    display: none;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    width: 400px;
+    max-width: 90%;
+    padding: 20px;
+    box-sizing: border-box;
+    position: fixed;
+    top: 33px;
+    left: 50%;
+    transform: translateX(-50%);
+}
+.modal__task-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #e0e0e0;
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+}
+.modal__task-header h2 {
+    font-size: 18px;
+    margin: 0;
+}
+.modal__task-header .close {
+    font-size: 20px;
+    cursor: pointer;
+}
+.modal__task-body {
+    display: flex;
+    flex-direction: column;
+}
+.modal__task-body label {
+    font-size: 14px;
+    margin-bottom: 5px;
+}
+.modal__task-body input, .modal__task-body select {
+    font-size: 14px;
+    padding: 10px;
+    margin-bottom: 20px;
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+    width: 100%;
+    box-sizing: border-box;
+}
+.modal__task-body input[type="date"] {
+    padding-right: 30px;
+}
+.modal__task-body .error {
+    color: red;
+    font-size: 12px;
+    margin-top: -15px;
+    margin-bottom: 15px;
+}
+.modal__task-footer {
+    display: flex;
+    justify-content: flex-end;
+    border-top: 1px solid #e0e0e0;
+    padding-top: 10px;
+}
+.modal__task-footer button {
+    font-size: 14px;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+.modal__task-footer .cancel {
+    background-color: #e0e0e0;
+    margin-right: 10px;
+}
+.modal__task-footer .save {
+    background-color: #007bff;
+    color: white;
+}

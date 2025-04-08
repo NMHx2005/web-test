@@ -1,0 +1,558 @@
+:root {
+    --primary-color: #0D6EFD;
+    --secondary-color: #1E293B;
+    --text-color: #212529;
+    --light-gray: #F8F9FA;
+    --border-color: #DEE2E6;
+    --edit-color: #FFC107;
+    --delete-color: #DC3545;
+    --detail-color: #0D6EFD;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    background-color: var(--light-gray);
+    color: var(--text-color);
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.project-manager-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Header Styles */
+.main-header {
+    background-color: #212529;
+    color: white;
+    padding: 1rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.project-detail-header, .member-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.project-detail-header {
+    margin-bottom: 24px;
+}
+.header-left a {
+    text-decoration: none;
+    color: white;
+}
+
+.header-left h1 {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 500;
+}
+
+.header-right nav ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    gap: 1.5rem;
+}
+
+.header-right nav a {
+    color: rgba(255, 255, 255, 0.85);
+    text-decoration: none;
+    font-size: 0.9rem;
+}
+
+.header-right nav a:hover {
+    color: white;
+}
+
+/* Main Content Styles */
+.main-content {
+    margin: 25px;
+    padding: 25px;
+}
+
+.project-title {
+    font-size: 24px;
+    font-weight: 600;
+    color: #212529;
+    margin: 0 0 8px 0;
+}
+
+.project-description {
+    color: #6C757D;
+    font-size: 14px;
+    margin: 0;
+}
+
+/* Member Section Styles */
+.member-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: #212529;
+}
+
+.member-section {
+    width: 400px;
+    max-width: 400px;
+}
+
+.member-list {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.member-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.member-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 500;
+}
+
+.member-avatar.blue {
+    background: #0D6EFD;
+}
+
+.member-avatar.purple {
+    background: #6F42C1;
+}
+
+.member-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.member-name {
+    font-size: 14px;
+    color: #212529;
+}
+
+.member-role {
+    font-size: 12px;
+    color: #6C757D;
+}
+
+.add-member-btn {
+    padding: 6px 12px;
+    background: white;
+    border: 1px solid #DEE2E6;
+    border-radius: 4px;
+    color: #212529;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+/* Task Section Styles */
+.task-section {
+    margin-top: 32px;
+    background: #FFFFFF;
+    border-radius: 4px;
+    padding: 17px;
+    box-shadow: 0px 5px 5px 0px #00000033;
+}
+
+.task-actions-right {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.task-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+}
+
+.task-title {
+    font-size: 20px;
+    font-weight: 500;
+    margin-bottom: 8px;
+    color: #212529;
+}
+
+.task-actions {
+    display: flex;
+    width: 100%;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.search-box input {
+    padding: 6px 12px;
+    border: 1px solid #DEE2E6;
+    border-radius: 4px;
+    width: 240px;
+    font-size: 14px;
+}
+
+.sort-btn {
+    padding: 6px 12px;
+    background: white;
+    border: 1px solid #DEE2E6;
+    border-radius: 4px;
+    color: #212529;
+    font-size: 14px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.add-task-btn {
+    padding: 6px 12px;
+    background: #0D6EFD;
+    border: none;
+    border-radius: 4px;
+    color: white;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.task-group {
+    margin-bottom: 24px;
+}
+
+.group-header {
+    margin-bottom: 0;
+    background-color: #FFFFFF;
+    cursor: pointer;
+}
+
+.group-header td {
+    padding: 8px 16px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #212529;
+}
+
+.group-title::before {
+    content: "▼  ";
+    display: inline-block;
+    transition: transform 0.3s;
+    margin-right: 5px;
+}
+
+.group-header.collapsed .group-title::before {
+    transform: rotate(-90deg);
+}
+
+/* Định dạng bảng */
+.task-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    border: none;
+    table-layout: fixed;
+}
+
+/* Định dạng tiêu đề cột */
+.task-table th {
+    background: #F8F9FA;
+    padding: 12px 16px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #212529;
+    text-align: left; /* Mặc định căn trái */
+    border-bottom: 1px solid #E5E7EB;
+    border-left: 1px solid #E5E7EB;
+    border-right: 1px solid #E5E7EB;
+    border-top: 1px solid #E5E7EB;
+    font-weight: 800;
+    text-align: center;
+}
+
+
+/* Cố định chiều rộng cho từng cột */
+.task-table th:nth-child(1) { /* Tên Nhiệm Vụ */
+    width: 25%;
+}
+
+.task-table th:nth-child(2) { /* Người Phụ Trách */
+    width: 15%;
+}
+
+.task-table th:nth-child(3) { /* Ưu Tiên */
+    width: 10%;
+}
+
+.task-table th:nth-child(4) { /* Ngày Bắt Đầu */
+    width: 10%;
+}
+
+.task-table th:nth-child(5) { /* Hạn Chót */
+    width: 10%;
+}
+
+.task-table th:nth-child(6) { /* Tiến độ */
+    width: 15%;
+}
+
+.task-table th:nth-child(7) { /* Hành động */
+    width: 15%;
+}
+
+/* Định dạng ô dữ liệu */
+.task-table td {
+    padding: 12px 16px;
+    font-size: 14px;
+    color: #212529;
+    border-bottom: 1px solid #E5E7EB;
+    border-left: 1px solid #E5E7EB;
+    border-right: 1px solid #E5E7EB;
+    border-top: 1px solid #E5E7EB;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    text-align: left; /* Mặc định căn trái */
+}
+
+/* Căn giữa các ô dữ liệu từ cột 2 đến cột 7 */
+.task-table td:nth-child(2), /* Người Phụ Trách */
+.task-table td:nth-child(3), /* Ưu Tiên */
+.task-table td:nth-child(4), /* Ngày Bắt Đầu */
+.task-table td:nth-child(5), /* Hạn Chót */
+.task-table td:nth-child(6), /* Tiến độ */
+.task-table td:nth-child(7) { /* Hành động */
+    text-align: center;
+}
+
+/* Định dạng màu chữ cho cột Ngày Bắt Đầu (cột thứ 4) */
+.task-table td:nth-child(4) {
+    color: var(--primary-color);
+}
+
+/* Định dạng màu chữ cho cột Hạn Chót (cột thứ 5) */
+.task-table td:nth-child(5) {
+    color: var(--primary-color);
+}
+
+/* Đảm bảo tiêu đề nhóm không bị ảnh hưởng */
+.group-header td {
+    padding: 8px 16px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #212529;
+    white-space: nowrap;
+    border-bottom: none;
+    text-align: left; /* Giữ căn trái cho tiêu đề nhóm */
+}
+.task-table tr:hover {
+    background-color: #F8F9FA;
+}
+
+.task-row {
+    display: none;
+}
+
+.task-row.visible {
+    display: table-row;
+}
+
+.priority-tag,
+.status-tag {
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 500;
+    display: inline-block;
+}
+
+.priority-tag.high {
+    background: #DC3545;
+    color: white;
+}
+
+.priority-tag.medium {
+    background: #FFC107;
+    /* color: #000; */
+    color: white;
+}
+
+.priority-tag.low {
+    background: #0DCAF0;
+    /* color: #000; */
+    color: white;
+}
+
+.status-tag.on-track {
+    background: #198754;
+    color: white;
+}
+
+.status-tag.at-risk {
+    background: #FFC107;
+    /* color: #000; */
+    color: white;
+}
+
+.status-tag.delayed {
+    background: #DC3545;
+    color: white;
+}
+
+.action-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+}
+
+.btn-edit,
+.btn-delete {
+    padding: 4px 12px;
+    border-radius: 4px;
+    font-size: 14px;
+    cursor: pointer;
+    border: none;
+}
+
+.btn-edit {
+    background: #FFC107;
+    color: #000;
+}
+
+.btn-delete {
+    background: #DC3545;
+    color: white;
+}
+
+/* Footer Styles */
+.main-footer {
+    margin-top: auto;
+    padding: 16px;
+    background: #212529;
+    color: white;
+    text-align: center;
+    font-size: 14px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .main-header {
+        padding: 16px;
+    }
+
+    .main-content {
+        margin: 16px;
+        padding: 16px;
+    }
+
+    .member-list {
+        flex-wrap: wrap;
+    }
+
+    .task-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 16px;
+    }
+
+    .task-actions {
+        flex-direction: column;
+        width: 100%;
+        gap: 8px;
+    }
+
+    .search-box,
+    .search-box input,
+    .sort-btn,
+    .add-task-btn {
+        width: 100%;
+    }
+
+    .task-table {
+        display: block;
+        overflow-x: auto;
+    }
+}
+
+
+
+
+/* Thêm style cho thông báo */
+.notification {
+    position: fixed;
+    top: 70px;
+    right: 20px;
+    padding: 15px 25px;
+    border-radius: 4px;
+    color: white;
+    z-index: 1000;
+    display: block;
+}
+
+/* Đảm bảo task-row hiển thị đúng */
+.task-row {
+    display: none;
+}
+
+.task-row.visible {
+    display: table-row;
+}
+
+/* Style cho bảng thành viên trong modal */
+.member-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.member-table th, .member-table td {
+    padding: 8px 12px;
+    border: 1px solid var(--border-color);
+    text-align: left;
+}
+
+.member-table th {
+    background-color: var(--light-gray);
+    font-weight: 600;
+}
+
+.member-table .action-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+}
+
+/* Style cho lỗi trong form */
+.error {
+    border-color: var(--delete-color) !important;
+}
+
+/* Đảm bảo nút trong modal danh sách thành viên */
+.modal__member_list .btn-edit,
+.modal__member_list .btn-delete {
+    padding: 4px 12px;
+    border-radius: 4px;
+    font-size: 14px;
+    cursor: pointer;
+    border: none;
+}
+
+.modal__member_list .btn-edit {
+    background: var(--edit-color);
+    color: #000;
+}
+
+.modal__member_list .btn-delete {
+    background: var(--delete-color);
+    color: white;
+}

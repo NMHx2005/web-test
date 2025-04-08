@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản lý nhiệm vụ</title>
+    <link rel="stylesheet" href="../css/personal-tasks.css">
+    <link rel="stylesheet" href="../css/project-detail.css">
+    <link rel="stylesheet" href="../css/modal.css">
+</head>
+<body>
+    <div class="overlay" id="overlay"></div>
+    <header class="main-header">
+        <div class="header-left">
+            <a href="./project-manager.html">
+                <h1>Quản Lý Dự Án</h1>
+            </a>
+        </div>
+        <div class="header-right">
+            <nav>
+                <ul>
+                    <li><a href="project-detail.html">Dự Án</a></li>
+                    <li><a href="./personal-tasks.html" class="active">Nhiệm Vụ của tôi</a></li>
+                    <li><a href="#" id="logout-btn" onclick="logout(); return false;">Đăng Xuất</a></li> 
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <div class="task-manager-header">
+            <h1 class="page-title">Quản lý nhiệm vụ</h1>
+        </div>
+        <div class="task-filters">
+            <div class="sort-dropdown">
+                <select class="sort-btn">
+                    <option value="">Sắp xếp theo</option>
+                    <option value="start-date">Ngày bắt đầu</option>
+                    <option value="progress">Tiến độ</option>
+                </select>
+            </div>
+            <div class="search-box">
+                <input type="text" placeholder="Tìm kiếm nhiệm vụ" id="search-input">
+            </div>
+        </div>
+
+        <section class="task-section">
+            <div class="task-title">Danh Sách Nhiệm Vụ</div>
+            <div class="task-group">
+                <table class="task-table">
+                    <thead>
+                        <tr>
+                            <th>Tên Nhiệm Vụ</th>
+                            <th>Độ Ưu Tiên</th>
+                            <th>Trạng Thái</th>
+                            <th>Ngày Bắt Đầu</th>
+                            <th>Hạn Chót</th>
+                            <th>Tiến độ</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Nội dung sẽ được render bởi JS -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+
+    <div class="modal__status" id="status-modal" style="display: none;">
+        <div class="modal__status-header">
+            <h2>Cập nhật trạng thái</h2>
+            <span class="close" id="status-close">×</span>
+        </div>
+        <div class="modal__status-body">
+            Xác nhận cập nhật trạng thái nhiệm vụ
+        </div>
+        <div class="modal__status-footer">
+            <button class="cancel" id="status-cancel">Hủy</button>
+            <button class="confirm" id="status-confirm">Xác nhận</button>
+        </div>
+    </div>
+
+    <footer class="main-footer">
+        <p>© 2025 Quản Lý Dự Án Nhóm. All rights reserved.</p>
+    </footer>
+
+    <script src="../js/init-data.js"></script>
+    <script src="../js/personal-tasks.js"></script>
+    <script src="../js/auth.js"></script>
+</body>
+</html>
