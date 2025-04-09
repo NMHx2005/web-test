@@ -1,354 +1,335 @@
+// Constants
+const EMAIL_MIN_LENGTH = 5;
+const EMAIL_MAX_LENGTH = 100;
+const ROLE_MIN_LENGTH = 2;
+const ROLE_MAX_LENGTH = 50;
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+// DOM Elements
+let currentProject = null;
+let currentTasks = [];
+let sortBy = 'dueDate'; // Default sort by due date
+let searchQuery = '';
+
+// Initialize
 document.addEventListener('DOMContentLoaded', function() {
-    // Lấy project ID từ URL
     const urlParams = new URLSearchParams(window.location.search);
     const projectId = parseInt(urlParams.get('id'));
-
-    // Load dữ liệu từ localStorage
-    const projects = JSON.parse(localStorage.getItem('projects')) || [];
-    const tasks = JSON.parse(localStorage.getItem('tasks')) || [];
-
-    // Tìm project theo ID
-    const currentProject = projects.find(p => p.id === projectId);
-    if (!currentProject) {
-        window.location.href = 'project-manager.html';
-        return;
-    }
-
-    // Hiển thị thông tin dự án
-    function renderProjectInfo() {
-        document.querySelector('.project-name').textContent = currentProject.projectName;
-        document.querySelector('.project-description').textContent = currentProject.description || '';
-    }
-
-    // Hiển thị danh sách thành viên
-    function renderMembers() {
-        const memberList = document.querySelector('.member-list');
-        if (memberList && currentProject.members) {
-            memberList.innerHTML = currentProject.members.map(member => `
-                <div class="member-item">
-                    <div class="member-info">
-                        <span class="member-name">${member.name}</span>
-                        <span class="member-role">${member.role}</span>
-                    </div>
-                    <div class="member-actions">
-                        <button class="btn-edit-member" data-id="${member.userId}">Sửa</button>
-                        <button class="btn-delete-member" data-id="${member.userId}">Xóa</button>
-                    </div>
-                </div>
-            `).join('');
-        }
-    }
-
-    // Hiển thị danh sách nhiệm vụ của dự án
-    function renderTasks() {
-        const projectTasks = JSON.parse(localStorage.getItem(`tasks_${currentProject.projectName}`)) || [];
-        const taskTable = document.querySelector('.task-list tbody');
-        
-        if (taskTable) {
-            // Xóa nội dung hiện tại của bảng
-            taskTable.innerHTML = '';
-
-            // Nhóm nhiệm vụ theo trạng thái
-            const statusGroups = {
-                'To do': [],
-                'In progress': [],
-                'Pending': [],
-                'Done': []
-            };
-
-            // Phân loại nhiệm vụ vào các nhóm
-            projectTasks.forEach(task => {
-                if (statusGroups[task.status]) {
-                    statusGroups[task.status].push(task);
-                }
-            });
-
-            // Render từng nhóm
-            Object.entries(statusGroups).forEach(([status, tasks]) => {
-                // Thêm header cho nhóm
-                const groupHeader = document.createElement('tr');
-                groupHeader.className = 'group-header collapsible';
-                groupHeader.setAttribute('data-group', status.toLowerCase().replace(' ', '-'));
-                groupHeader.innerHTML = `
-                    <td colspan="7">
-                        <span class="group-title">${status} (${tasks.length})</span>
-                    </td>
-                `;
-                taskTable.appendChild(groupHeader);
-
-                // Thêm các nhiệm vụ trong nhóm
-                tasks.forEach(task => {
-                    const taskRow = document.createElement('tr');
-                    taskRow.className = `task-row ${status.toLowerCase().replace(' ', '-')}`;
-                    taskRow.innerHTML = `
-                        <td>${task.taskName}</td>
-                        <td>${getAssigneeName(task.assigneeId)}</td>
-                        <td><span class="priority-tag ${task.priority.toLowerCase()}">${task.priority}</span></td>
-                        <td>${formatDate(task.startDate)}</td>
-                        <td>${formatDate(task.dueDate)}</td>
-                        <td><span class="status-tag ${task.progress.toLowerCase().replace(' ', '-')}">${task.progress}</span></td>
-                        <td>
-                            <div class="action-buttons">
-                                <button class="btn-edit" data-id="${task.id}">Sửa</button>
-                                <button class="btn-delete" data-id="${task.id}">Xóa</button>
-                            </div>
-                        </td>
-                    `;
-                    taskTable.appendChild(taskRow);
-                });
-            });
-
-            // Thêm sự kiện cho các nút collapse/expand
-            document.querySelectorAll('.group-header').forEach(header => {
-                header.addEventListener('click', function() {
-                    const group = this.getAttribute('data-group');
-                    const rows = document.querySelectorAll(`.task-row.${group}`);
-                    this.classList.toggle('collapsed');
-                    rows.forEach(row => {
-                        row.style.display = this.classList.contains('collapsed') ? 'none' : '';
-                    });
-                });
-            });
-        } else {
-            console.error('Không tìm thấy bảng nhiệm vụ');
-        }
-    }
-
-    // Helper function để lấy tên người phụ trách
-    function getAssigneeName(assigneeId) {
-        const member = currentProject.members.find(m => m.userId === assigneeId);
-        return member ? member.name : 'Unknown';
-    }
-
-    // Format date helper
-    function formatDate(dateString) {
-        const date = new Date(dateString);
-        return `${String(date.getDate()).padStart(2, '0')}-${String(date.getMonth() + 1).padStart(2, '0')}`;
-    }
-
-    // Xử lý thêm thành viên mới
-    const addMemberForm = document.querySelector('#addMemberForm');
-    if (addMemberForm) {
-        addMemberForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            const memberName = this.querySelector('[name="member-name"]').value.trim();
-            const memberRole = this.querySelector('[name="member-role"]').value.trim();
-            
-            // Kiểm tra trùng tên
-            const isExist = currentProject.members.some(m => 
-                m.name.toLowerCase() === memberName.toLowerCase()
-            );
-            
-            if (isExist) {
-                showNotification('Tên thành viên đã tồn tại!', 'error');
-                return;
-            }
-            
-            // Thêm thành viên mới
-            const newMember = {
-                userId: currentProject.members.length > 0 
-                    ? Math.max(...currentProject.members.map(m => m.userId)) + 1 
-                    : 1,
-                name: memberName,
-                role: memberRole
-            };
-            
-            currentProject.members.push(newMember);
-            
-            // Cập nhật localStorage
-            localStorage.setItem('projects', JSON.stringify(projects));
-            
-            // Đóng modal và hiển thị thông báo
-            hideModal('memberModal');
-            showNotification('Thêm thành viên thành công!', 'success');
-            renderMembers();
-        });
-    }
-
-    // Xử lý modal thêm nhiệm vụ
-    const addTaskBtn = document.querySelector('.add-task-btn');
-    const taskModal = document.getElementById('taskModal');
-    const closeTaskModal = taskModal.querySelector('.close');
-    const cancelTaskBtn = taskModal.querySelector('.cancel');
-    const addTaskForm = document.getElementById('addTaskForm');
-
     
-
-    // Kiểm tra xem các phần tử có tồn tại không
-    if (!addTaskBtn || !taskModal || !closeTaskModal || !cancelTaskBtn || !addTaskForm) {
-        console.error('Không tìm thấy các phần tử cần thiết cho modal thêm nhiệm vụ');
-        return;
+    if (projectId) {
+        loadProject(projectId);
+        setupEventListeners();
+    } else {
+        window.location.href = 'project-manager.html';
     }
+});
 
-    // Xử lý hiển thị modal
-    addTaskBtn.addEventListener('click', function() {
-        console.log('Button clicked');
-        taskModal.style.display = 'block';
-    });
-
-    // Xử lý đóng modal
-    function closeTaskModalFunc() {
-        taskModal.style.display = 'none';
-        addTaskForm.reset();
+// Load project data
+function loadProject(projectId) {
+    const projects = JSON.parse(localStorage.getItem('projects') || '[]');
+    currentProject = projects.find(p => p.id === projectId);
+    
+    if (currentProject) {
+        document.querySelector('.project-name').textContent = currentProject.projectName;
+        document.querySelector('.project-description').textContent = currentProject.description;
+        loadTasks();
+        renderMembers();
+    } else {
+        window.location.href = 'project-manager.html';
     }
+}
 
-    closeTaskModal.addEventListener('click', closeTaskModalFunc);
-    cancelTaskBtn.addEventListener('click', closeTaskModalFunc);
+// Load tasks for current project
+function loadTasks() {
+    const tasks = JSON.parse(localStorage.getItem('tasks') || '{}');
+    currentTasks = tasks[currentProject.id] || [];
+    renderTasks();
+}
 
-    // Đóng modal khi click ra ngoài
-    window.addEventListener('click', function(event) {
-        if (event.target === taskModal) {
-            closeTaskModalFunc();
-        }
-    });
-
-    // Xử lý submit form
-    addTaskForm.addEventListener('submit', function(e) {
-        e.preventDefault();
-        
-        const taskName = this.querySelector('[name="task-name"]').value.trim();
-        const assigneeId = parseInt(this.querySelector('[name="assignee"]').value);
-        const status = this.querySelector('[name="status"]').value;
-        const startDate = this.querySelector('[name="start-date"]').value;
-        const dueDate = this.querySelector('[name="due-date"]').value;
-        const priority = this.querySelector('[name="priority"]').value;
-        const progress = this.querySelector('[name="progress"]').value;
-        
-        // Lấy danh sách nhiệm vụ từ localStorage
-        let projectTasks = JSON.parse(localStorage.getItem(`tasks_${currentProject.projectName}`)) || [];
-        console.log('Current tasks:', projectTasks);
-        
-        // Kiểm tra trùng tên nhiệm vụ trong dự án
-        const isExist = projectTasks.some(t => 
-            t.taskName.toLowerCase() === taskName.toLowerCase()
-        );
-        
-        if (isExist) {
-            showNotification('Tên nhiệm vụ đã tồn tại trong dự án!', 'error');
-            return;
-        }
-        
-        // Thêm nhiệm vụ mới
-        const newTask = {
-            id: projectTasks.length > 0 ? Math.max(...projectTasks.map(t => t.id)) + 1 : 1,
-            taskName,
-            projectId: currentProject.id,
-            projectName: currentProject.projectName,
-            assigneeId,
-            status,
-            priority,
-            progress,
-            startDate,
-            dueDate,
-            createdAt: new Date().toISOString()
-        };
-        console.log('New task:', newTask);
-        
-        projectTasks.push(newTask);
-        
-        // Lưu vào localStorage theo tên dự án
-        localStorage.setItem(`tasks_${currentProject.projectName}`, JSON.stringify(projectTasks));
-        console.log('Updated tasks:', JSON.parse(localStorage.getItem(`tasks_${currentProject.projectName}`)));
-        
-        // Cập nhật danh sách nhiệm vụ tổng thể
-        let allTasks = JSON.parse(localStorage.getItem('all_tasks')) || [];
-        allTasks.push(newTask);
-        localStorage.setItem('all_tasks', JSON.stringify(allTasks));
-        
-        // Đóng modal và hiển thị thông báo
-        closeTaskModalFunc();
-        showNotification('Thêm nhiệm vụ thành công!', 'success');
+// Setup event listeners
+function setupEventListeners() {
+    // Add task button
+    document.querySelector('.add-task-btn').addEventListener('click', showAddTaskModal);
+    
+    // Add member button
+    document.querySelector('.add-member-btn').addEventListener('click', showAddMemberModal);
+    
+    // Search input
+    document.querySelector('.search-box input').addEventListener('input', function(e) {
+        searchQuery = e.target.value.toLowerCase();
         renderTasks();
     });
-
-    // Xử lý xóa thành viên
-    document.addEventListener('click', function(e) {
-        if (e.target.classList.contains('btn-delete-member')) {
-            const userId = parseInt(e.target.getAttribute('data-id'));
-            if (confirm('Bạn có chắc chắn muốn xóa thành viên này?')) {
-                const index = currentProject.members.findIndex(m => m.userId === userId);
-                if (index !== -1) {
-                    currentProject.members.splice(index, 1);
-                    localStorage.setItem('projects', JSON.stringify(projects));
-                    showNotification('Xóa thành viên thành công!', 'success');
-                    renderMembers();
-                }
-            }
-        }
+    
+    // Sort buttons
+    document.querySelectorAll('.sort-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            sortBy = this.dataset.sort;
+            document.querySelectorAll('.sort-btn').forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+            renderTasks();
+        });
     });
-
-    // Xử lý xóa nhiệm vụ
-    document.addEventListener('click', function(e) {
-        if (e.target.classList.contains('btn-delete')) {
-            const taskId = parseInt(e.target.getAttribute('data-id'));
-            if (confirm('Bạn có chắc chắn muốn xóa nhiệm vụ này?')) {
-                let projectTasks = JSON.parse(localStorage.getItem(`tasks_${currentProject.projectName}`)) || [];
-                const index = projectTasks.findIndex(t => t.id === taskId);
-                
-                if (index !== -1) {
-                    // Xóa khỏi danh sách nhiệm vụ của dự án
-                    projectTasks.splice(index, 1);
-                    localStorage.setItem(`tasks_${currentProject.projectName}`, JSON.stringify(projectTasks));
-                    
-                    // Xóa khỏi danh sách nhiệm vụ tổng thể
-                    let allTasks = JSON.parse(localStorage.getItem('all_tasks')) || [];
-                    allTasks = allTasks.filter(t => t.id !== taskId);
-                    localStorage.setItem('all_tasks', JSON.stringify(allTasks));
-                    
-                    showNotification('Xóa nhiệm vụ thành công!', 'success');
-                    renderTasks();
-                }
-            }
-        }
+    
+    // Modal close buttons
+    document.querySelectorAll('.close').forEach(btn => {
+        btn.addEventListener('click', hideModals);
     });
+    
+    // Form submissions
+    document.querySelector('.task-form').addEventListener('submit', handleTaskSubmit);
+    document.querySelector('.member-form').addEventListener('submit', handleMemberSubmit);
+}
 
-    // Xử lý cập nhật trạng thái nhiệm vụ
-    document.addEventListener('click', function(e) {
-        if (e.target.classList.contains('status-toggle')) {
-            const taskId = parseInt(e.target.getAttribute('data-task-id'));
-            const task = tasks.find(t => t.id === taskId);
-            
-            if (task) {
-                const statusFlow = {
-                    'To do': 'In progress',
-                    'In progress': 'Pending',
-                    'Pending': 'Done',
-                    'Done': 'To do'
-                };
-                
-                task.status = statusFlow[task.status];
-                localStorage.setItem('tasks', JSON.stringify(tasks));
-                showNotification(`Đã cập nhật trạng thái thành ${task.status}`, 'success');
-                renderTasks();
-            }
+// Render tasks with sorting and search
+function renderTasks() {
+    let filteredTasks = currentTasks.filter(task => 
+        task.name.toLowerCase().includes(searchQuery)
+    );
+    
+    // Sort tasks
+    filteredTasks.sort((a, b) => {
+        if (sortBy === 'dueDate') {
+            return new Date(a.dueDate) - new Date(b.dueDate);
+        } else if (sortBy === 'priority') {
+            const priorityOrder = { 'Cao': 0, 'Trung Bình': 1, 'Thấp': 2 };
+            return priorityOrder[a.priority] - priorityOrder[b.priority];
         }
+        return 0;
     });
+    
+    const tbody = document.querySelector('.task-table tbody');
+    tbody.innerHTML = '';
+    
+    filteredTasks.forEach(task => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td>${task.name}</td>
+            <td>${task.assignee}</td>
+            <td>${formatDate(task.assignDate)}</td>
+            <td>${formatDate(task.dueDate)}</td>
+            <td>${task.priority}</td>
+            <td>${task.progress}</td>
+            <td>${task.status}</td>
+            <td class="action-buttons">
+                <button class="btn-edit" onclick="editTask(${task.id})">Sửa</button>
+                <button class="btn-delete" onclick="deleteTask(${task.id})">Xóa</button>
+            </td>
+        `;
+        tbody.appendChild(tr);
+    });
+}
 
-    // Khởi tạo hiển thị
-    renderProjectInfo();
-    renderMembers();
+// Render project members
+function renderMembers() {
+    const tbody = document.querySelector('.member-table tbody');
+    tbody.innerHTML = '';
+    
+    currentProject.members.forEach(member => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td>${member.name}</td>
+            <td>${member.role}</td>
+            <td class="action-buttons">
+                <button class="btn-delete" onclick="removeMember(${member.userId})">Xóa</button>
+            </td>
+        `;
+        tbody.appendChild(tr);
+    });
+}
+
+// Show add task modal
+function showAddTaskModal() {
+    document.querySelector('.task-modal').style.display = 'block';
+    document.querySelector('.overlay').style.display = 'block';
+    document.querySelector('.task-form').reset();
+}
+
+// Show add member modal
+function showAddMemberModal() {
+    document.querySelector('.member-modal').style.display = 'block';
+    document.querySelector('.overlay').style.display = 'block';
+    document.querySelector('.member-form').reset();
+}
+
+// Handle task form submission
+function handleTaskSubmit(e) {
+    e.preventDefault();
+    
+    const taskData = {
+        id: currentTasks.length > 0 ? Math.max(...currentTasks.map(t => t.id)) + 1 : 1,
+        name: document.getElementById('task-name').value.trim(),
+        assignee: document.getElementById('task-assignee').value.trim(),
+        assignDate: document.getElementById('task-assign-date').value,
+        dueDate: document.getElementById('task-due-date').value,
+        priority: document.getElementById('task-priority').value,
+        progress: document.getElementById('task-progress').value,
+        status: document.getElementById('task-status').value
+    };
+    
+    currentTasks.push(taskData);
+    
+    const tasks = JSON.parse(localStorage.getItem('tasks') || '{}');
+    tasks[currentProject.id] = currentTasks;
+    localStorage.setItem('tasks', JSON.stringify(tasks));
+    
+    hideModals();
     renderTasks();
+}
 
-    // Helper function để hiển thị thông báo
-    function showNotification(message, type = 'success') {
-        const notification = document.querySelector('.notification');
-        if (notification) {
-            notification.textContent = message;
-            notification.className = `notification ${type}`;
-            notification.style.display = 'block';
-            
-            setTimeout(() => {
-                notification.style.display = 'none';
-            }, 3000);
-        }
+// Handle member form submission
+function handleMemberSubmit(e) {
+    e.preventDefault();
+    
+    const email = document.getElementById('member-email').value.trim();
+    const role = document.getElementById('member-role').value.trim();
+    
+    // Validation
+    if (!validateMemberInput(email, role)) {
+        return;
     }
+    
+    // Check if email exists in users
+    const users = JSON.parse(localStorage.getItem('users') || '[]');
+    const user = users.find(u => u.email === email);
+    
+    if (!user) {
+        showError(document.getElementById('member-email').nextElementSibling, 'Email không tồn tại trong hệ thống');
+        return;
+    }
+    
+    // Check if member already exists
+    if (currentProject.members.some(m => m.userId === user.id)) {
+        showError(document.getElementById('member-email').nextElementSibling, 'Thành viên đã tồn tại trong dự án');
+        return;
+    }
+    
+    // Add new member
+    const newMember = {
+        userId: user.id,
+        name: user.name,
+        role: role
+    };
+    
+    currentProject.members.push(newMember);
+    
+    // Update project in localStorage
+    const projects = JSON.parse(localStorage.getItem('projects'));
+    const projectIndex = projects.findIndex(p => p.id === currentProject.id);
+    if (projectIndex !== -1) {
+        projects[projectIndex] = currentProject;
+        localStorage.setItem('projects', JSON.stringify(projects));
+    }
+    
+    hideModals();
+    renderMembers();
+}
 
-    // Helper function để ẩn modal
-    function hideModal(modalId) {
-        const modal = document.getElementById(modalId);
-        if (modal) {
-            modal.style.display = 'none';
-        }
+// Validate member input
+function validateMemberInput(email, role) {
+    const emailError = document.getElementById('member-email').nextElementSibling;
+    const roleError = document.getElementById('member-role').nextElementSibling;
+    
+    let isValid = true;
+    
+    if (!email) {
+        showError(emailError, 'Email không được để trống');
+        isValid = false;
+    } else if (!EMAIL_REGEX.test(email)) {
+        showError(emailError, 'Email không đúng định dạng');
+        isValid = false;
+    } else if (email.length < EMAIL_MIN_LENGTH || email.length > EMAIL_MAX_LENGTH) {
+        showError(emailError, `Email phải có độ dài từ ${EMAIL_MIN_LENGTH} đến ${EMAIL_MAX_LENGTH} ký tự`);
+        isValid = false;
+    } else {
+        hideError(emailError);
     }
-}); 
+    
+    if (!role) {
+        showError(roleError, 'Vai trò không được để trống');
+        isValid = false;
+    } else if (role.length < ROLE_MIN_LENGTH || role.length > ROLE_MAX_LENGTH) {
+        showError(roleError, `Vai trò phải có độ dài từ ${ROLE_MIN_LENGTH} đến ${ROLE_MAX_LENGTH} ký tự`);
+        isValid = false;
+    } else {
+        hideError(roleError);
+    }
+    
+    return isValid;
+}
+
+// Show error message
+function showError(element, message) {
+    if (element && element.classList.contains('error-message')) {
+        element.textContent = message;
+        element.style.display = 'block';
+    }
+}
+
+// Hide error message
+function hideError(element) {
+    if (element && element.classList.contains('error-message')) {
+        element.style.display = 'none';
+    }
+}
+
+// Hide all modals
+function hideModals() {
+    document.querySelectorAll('.modal').forEach(modal => {
+        modal.style.display = 'none';
+    });
+    document.querySelector('.overlay').style.display = 'none';
+}
+
+// Format date
+function formatDate(dateString) {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('vi-VN');
+}
+
+// Edit task
+function editTask(taskId) {
+    const task = currentTasks.find(t => t.id === taskId);
+    if (task) {
+        document.querySelector('.task-modal').style.display = 'block';
+        document.querySelector('.overlay').style.display = 'block';
+        
+        document.getElementById('task-name').value = task.name;
+        document.getElementById('task-assignee').value = task.assignee;
+        document.getElementById('task-assign-date').value = task.assignDate;
+        document.getElementById('task-due-date').value = task.dueDate;
+        document.getElementById('task-priority').value = task.priority;
+        document.getElementById('task-progress').value = task.progress;
+        document.getElementById('task-status').value = task.status;
+        
+        document.querySelector('.task-form').dataset.taskId = taskId;
+    }
+}
+
+// Delete task
+function deleteTask(taskId) {
+    if (confirm('Bạn có chắc chắn muốn xóa nhiệm vụ này?')) {
+        currentTasks = currentTasks.filter(t => t.id !== taskId);
+        
+        const tasks = JSON.parse(localStorage.getItem('tasks') || '{}');
+        tasks[currentProject.id] = currentTasks;
+        localStorage.setItem('tasks', JSON.stringify(tasks));
+        
+        renderTasks();
+    }
+}
+
+// Remove member
+function removeMember(userId) {
+    if (confirm('Bạn có chắc chắn muốn xóa thành viên này?')) {
+        currentProject.members = currentProject.members.filter(m => m.userId !== userId);
+        
+        const projects = JSON.parse(localStorage.getItem('projects'));
+        const projectIndex = projects.findIndex(p => p.id === currentProject.id);
+        if (projectIndex !== -1) {
+            projects[projectIndex] = currentProject;
+            localStorage.setItem('projects', JSON.stringify(projects));
+        }
+        
+        renderMembers();
+    }
+} 

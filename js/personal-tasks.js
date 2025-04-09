@@ -1,16 +1,24 @@
+// Constants
+const ITEMS_PER_PAGE = 5;
+
+// DOM Elements
+let currentPage = 1;
+let searchQuery = '';
+let currentUser = null;
+
+// Initialize
 document.addEventListener('DOMContentLoaded', function() {
     console.log("DOMContentLoaded triggered");
 
     // Lấy thông tin người dùng hiện tại từ localStorage
-    const currentUserData = JSON.parse(localStorage.getItem('currentUser'));
-    if (!currentUserData || !currentUserData.name) {
+    currentUser = JSON.parse(localStorage.getItem('currentUser'));
+    if (!currentUser || !currentUser.name) {
         showNotification('Vui lòng đăng nhập để xem nhiệm vụ!', 'error');
         setTimeout(() => window.location.href = '../index.html', 2000);
         return;
     }
 
-    const currentUser = currentUserData.name;
-    console.log("Current User:", currentUser);
+    console.log("Current User:", currentUser.name);
 
     // Load dữ liệu từ localStorage
     let allTasks = JSON.parse(localStorage.getItem('tasks')) || {};
@@ -20,7 +28,7 @@ document.addEventListener('DOMContentLoaded', function() {
     function getPersonalTasks() {
         const personalTasks = [];
         for (const projectId in allTasks) {
-            const projectTasks = allTasks[projectId].filter(task => task.assignee === currentUser);
+            const projectTasks = allTasks[projectId].filter(task => task.assignee === currentUser.name);
             projectTasks.forEach(task => {
                 personalTasks.push({ ...task, projectId: parseInt(projectId) });
             });
@@ -48,7 +56,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Hàm format ngày tháng
     function formatDate(dateString) {
         const date = new Date(dateString);
-        return `${String(date.getDate()).padStart(2, '0')}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+        return date.toLocaleDateString('vi-VN');
     }
 
     // Hàm render nhiệm vụ theo nhóm
@@ -281,3 +289,173 @@ document.addEventListener('DOMContentLoaded', function() {
     // Khởi tạo hiển thị ban đầu
     renderTasks();
 });
+
+// Setup event listeners
+function setupEventListeners() {
+    // Search input
+    document.querySelector('.search-box input').addEventListener('input', function(e) {
+        searchQuery = e.target.value.toLowerCase();
+        currentPage = 1;
+        renderTasks();
+    });
+    
+    // Filter buttons
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+            currentPage = 1;
+            renderTasks();
+        });
+    });
+    
+    // Sort buttons
+    document.querySelectorAll('.sort-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            document.querySelectorAll('.sort-btn').forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+            renderTasks();
+        });
+    });
+}
+
+// Load personal tasks
+function loadPersonalTasks() {
+    const tasks = JSON.parse(localStorage.getItem('tasks') || '{}');
+    const projects = JSON.parse(localStorage.getItem('projects') || '[]');
+    
+    // Get all tasks assigned to current user
+    let personalTasks = [];
+    Object.entries(tasks).forEach(([projectId, projectTasks]) => {
+        const project = projects.find(p => p.id === parseInt(projectId));
+        if (project) {
+            projectTasks.forEach(task => {
+                if (task.assignee === currentUser.name) {
+                    personalTasks.push({
+                        ...task,
+                        projectName: project.projectName
+                    });
+                }
+            });
+        }
+    });
+    
+    renderTasks(personalTasks);
+}
+
+// Render tasks with filtering, sorting and pagination
+function renderTasks(tasks) {
+    // Filter tasks
+    let filteredTasks = tasks.filter(task => 
+        task.name.toLowerCase().includes(searchQuery) ||
+        task.projectName.toLowerCase().includes(searchQuery)
+    );
+    
+    // Get active filter
+    const activeFilter = document.querySelector('.filter-btn.active').dataset.filter;
+    if (activeFilter !== 'all') {
+        filteredTasks = filteredTasks.filter(task => task.status === activeFilter);
+    }
+    
+    // Get active sort
+    const activeSort = document.querySelector('.sort-btn.active').dataset.sort;
+    filteredTasks.sort((a, b) => {
+        if (activeSort === 'dueDate') {
+            return new Date(a.dueDate) - new Date(b.dueDate);
+        } else if (activeSort === 'priority') {
+            const priorityOrder = { 'Cao': 0, 'Trung Bình': 1, 'Thấp': 2 };
+            return priorityOrder[a.priority] - priorityOrder[b.priority];
+        }
+        return 0;
+    });
+    
+    // Pagination
+    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+    const endIndex = startIndex + ITEMS_PER_PAGE;
+    const paginatedTasks = filteredTasks.slice(startIndex, endIndex);
+    
+    // Render tasks
+    const tbody = document.querySelector('.task-table tbody');
+    tbody.innerHTML = '';
+    
+    paginatedTasks.forEach(task => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td>${task.name}</td>
+            <td>${task.projectName}</td>
+            <td>${formatDate(task.assignDate)}</td>
+            <td>${formatDate(task.dueDate)}</td>
+            <td>${task.priority}</td>
+            <td>${task.progress}</td>
+            <td>${task.status}</td>
+            <td class="action-buttons">
+                <button class="btn-view" onclick="viewTaskDetail(${task.id})">Xem</button>
+            </td>
+        `;
+        tbody.appendChild(tr);
+    });
+    
+    // Render pagination
+    renderPagination(filteredTasks.length);
+}
+
+// Render pagination
+function renderPagination(totalItems) {
+    const totalPages = Math.ceil(totalItems / ITEMS_PER_PAGE);
+    const pagination = document.querySelector('.pagination');
+    pagination.innerHTML = '';
+    
+    // Previous button
+    if (currentPage > 1) {
+        const prevButton = document.createElement('button');
+        prevButton.textContent = '<';
+        prevButton.addEventListener('click', () => {
+            currentPage--;
+            renderTasks();
+        });
+        pagination.appendChild(prevButton);
+    }
+    
+    // Page numbers
+    for (let i = 1; i <= totalPages; i++) {
+        const button = document.createElement('button');
+        button.textContent = i;
+        if (i === currentPage) {
+            button.classList.add('active');
+        }
+        button.addEventListener('click', () => {
+            currentPage = i;
+            renderTasks();
+        });
+        pagination.appendChild(button);
+    }
+    
+    // Next button
+    if (currentPage < totalPages) {
+        const nextButton = document.createElement('button');
+        nextButton.textContent = '>';
+        nextButton.addEventListener('click', () => {
+            currentPage++;
+            renderTasks();
+        });
+        pagination.appendChild(nextButton);
+    }
+}
+
+// View task detail
+function viewTaskDetail(taskId) {
+    // Find project containing this task
+    const tasks = JSON.parse(localStorage.getItem('tasks') || '{}');
+    const projects = JSON.parse(localStorage.getItem('projects') || '[]');
+    
+    let projectId = null;
+    Object.entries(tasks).forEach(([pid, projectTasks]) => {
+        if (projectTasks.some(t => t.id === taskId)) {
+            projectId = parseInt(pid);
+        }
+    });
+    
+    if (projectId) {
+        window.location.href = `project-detail.html?id=${projectId}`;
+    }
+}

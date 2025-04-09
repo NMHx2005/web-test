@@ -3,6 +3,7 @@ function initializeAuth() {
     const users = JSON.parse(localStorage.getItem('users')) || [];
     if (users.length === 0) {
         users.push({
+            id: 1,
             email: 'admin@gmail.com',
             password: '12345678',
             name: 'Admin',
@@ -43,8 +44,12 @@ function register(email, password, name) {
         return false;
     }
     
+    // Tạo ID mới
+    const newId = users.length > 0 ? Math.max(...users.map(u => u.id)) + 1 : 1;
+    
     // Thêm user mới
     const newUser = {
+        id: newId,
         email,
         password,
         name,

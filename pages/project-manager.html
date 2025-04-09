@@ -36,7 +36,7 @@
                     <span>Thêm Dự Án</span>
                 </button>
                 <div class="search-box">
-                    <input type="text" placeholder="Tìm kiếm dự án">
+                    <input type="text" id="search-input" placeholder="Tìm kiếm dự án">
                 </div>
             </div>
 
@@ -50,126 +50,43 @@
                             <th>Hành Động</th>
                         </tr>
                     </thead>
-                    <tbody>
-                        <tr>
-                            <td>1</td>
-                            <td>Xây dựng website thương mại điện tử</td>
-                            <td class="action-buttons">
-                                <button class="btn-edit">Sửa</button>
-                                <button class="btn-delete">Xóa</button>
-                                <button class="btn-detail">Chi tiết</button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>2</td>
-                            <td>Phát triển ứng dụng di động</td>
-                            <td class="action-buttons">
-                                <button class="btn-edit">Sửa</button>
-                                <button class="btn-delete">Xóa</button>
-                                <button class="btn-detail">Chi tiết</button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>3</td>
-                            <td>Quản lý dữ liệu khách hàng</td>
-                            <td class="action-buttons">
-                                <button class="btn-edit">Sửa</button>
-                                <button class="btn-delete">Xóa</button>
-                                <button class="btn-detail">Chi tiết</button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>4</td>
-                            <td>Xây dựng website thương mại điện tử</td>
-                            <td class="action-buttons">
-                                <button class="btn-edit">Sửa</button>
-                                <button class="btn-delete">Xóa</button>
-                                <button class="btn-detail">Chi tiết</button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>5</td>
-                            <td>Phát triển ứng dụng di động</td>
-                            <td class="action-buttons">
-                                <button class="btn-edit">Sửa</button>
-                                <button class="btn-delete">Xóa</button>
-                                <button class="btn-detail">Chi tiết</button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>6</td>
-                            <td>Quản lý dữ liệu khách hàng</td>
-                            <td class="action-buttons">
-                                <button class="btn-edit">Sửa</button>
-                                <button class="btn-delete">Xóa</button>
-                                <button class="btn-detail">Chi tiết</button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>7</td>
-                            <td>Xây dựng website thương mại điện tử</td>
-                            <td class="action-buttons">
-                                <button class="btn-edit">Sửa</button>
-                                <button class="btn-delete">Xóa</button>
-                                <button class="btn-detail">Chi tiết</button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>8</td>
-                            <td>Phát triển ứng dụng di động</td>
-                            <td class="action-buttons">
-                                <button class="btn-edit">Sửa</button>
-                                <button class="btn-delete">Xóa</button>
-                                <button class="btn-detail">Chi tiết</button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>9</td>
-                            <td>Quản lý dữ liệu khách hàng</td>
-                            <td class="action-buttons">
-                                <button class="btn-edit">Sửa</button>
-                                <button class="btn-delete">Xóa</button>
-                                <button class="btn-detail">Chi tiết</button>
-                            </td>
-                        </tr>
+                    <tbody id="project-list-body">
+                        <!-- Dữ liệu sẽ được thêm vào đây bằng JavaScript -->
                     </tbody>
                 </table>
             </div>
         </main>
-        <div class="pagination">
-                    <button class="active">1</button>
-                    <button>2</button>
-                    <button>3</button>
-                    <button class="next">></button>
-                </div>
+        <div class="pagination" id="pagination">
+            <!-- Phân trang sẽ được thêm vào đây bằng JavaScript -->
+        </div>
 
         <footer class="main-footer">
             <p>© 2025 Team management. All rights reserved.</p>
         </footer>
     </div>
 
-
-    <div class="modal">
+    <div class="modal" id="project-modal">
         <div class="modal-header">
             <h2>Thêm/sửa dự án</h2>
             <span class="close">&times;</span>
         </div>
-        <form>
+        <form id="project-form">
             <div class="modal-body">
                 <label for="project-name">Tên dự án</label>
-                <input name="project-name" type="text" id="project-name" class="error" placeholder="Nhập tên dự án mới ....">
-                <!-- <div class="error-message">Tên danh mục đã tồn tại</div> -->
+                <input name="project-name" type="text" id="project-name" placeholder="Nhập tên dự án mới ....">
+                <div class="error-message" id="project-name-error"></div>
                 <label for="project-description">Mô tả dự án</label>
                 <textarea id="project-description" name="project-description"></textarea>
+                <div class="error-message" id="project-description-error"></div>
             </div>
             <div class="modal-footer">
-                <button class="cancel">Huỷ</button>
-                <button class="save">Lưu</button>
+                <button type="button" class="cancel">Huỷ</button>
+                <button type="submit" class="save">Lưu</button>
             </div>
         </form>
     </div>
 
-    <div class="model__delete">
+    <div class="model__delete" id="delete-modal">
         <div class="model__delete-header">
             <h2>Xác nhận xóa</h2>
             <span class="close">&times;</span>
@@ -182,7 +99,8 @@
             <button class="delete-btn">Xoá</button>
         </div>
     </div>
+    <script src="../js/init-data.js"></script>
     <script src="../js/auth.js"></script>
-    <script src="../js/product-manager.js"></script>
+    <script src="../js/project-manager.js"></script>
 </body>
 </html> 
