@@ -171,30 +171,39 @@ function loadTasks() {
 }
 
 // Member Management Functions
-    function renderMembers() {
+function renderMembers() {
     if (!currentProject || !currentProject.members) {
         return;
     }
     
-        const memberList = document.querySelector('.member-list');
+    const memberList = document.querySelector('.member-list');
     if (memberList) {
-        memberList.innerHTML = currentProject.members.map((member, idx) => `
-                <div class="member-item">
+        // Chỉ hiển thị 3 thành viên đầu tiên
+        const displayedMembers = currentProject.members.slice(0, 3);
+        
+        memberList.innerHTML = displayedMembers.map((member, idx) => `
+            <div class="member-item">
                 <div class="member-avatar ${idx % 2 === 0 ? 'blue' : 'purple'}">${member.name.split(' ').map(word => word[0]).join('').toUpperCase()}</div>
-                    <div class="member-info">
-                        <span class="member-name">${member.name}</span>
-                        <span class="member-role">${member.role}</span>
-                    </div>
-                    </div>
-        `).join('') + `
-            <div class="list__member">
-                <img alt="" src="../assets/images/icon_ba_cham.png" />
+                <div class="member-info">
+                    <span class="member-name">${member.name}</span>
+                    <span class="member-role">${member.role}</span>
                 </div>
-        `;
-        const listMemberBtn = document.querySelector('.list__member');
-        if (listMemberBtn) {
-            listMemberBtn.removeEventListener('click', showMemberListModal);
-            listMemberBtn.addEventListener('click', showMemberListModal);
+            </div>
+        `).join('');
+        
+        // Thêm nút "Xem thêm" nếu có nhiều hơn 3 thành viên
+        if (currentProject.members.length > 3) {
+            memberList.innerHTML += `
+                <div class="list__member">
+                    <img alt="" src="../assets/images/icon_ba_cham.png" />
+                </div>
+            `;
+            
+            const listMemberBtn = document.querySelector('.list__member');
+            if (listMemberBtn) {
+                listMemberBtn.removeEventListener('click', showMemberListModal);
+                listMemberBtn.addEventListener('click', showMemberListModal);
+            }
         }
     }
 }
