@@ -17,7 +17,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const projectTitle = document.querySelector('.project-title');
     const projectDescription = document.querySelector('.project-description');
     if (projectTitle && projectDescription) {
-        projectTitle.textContent = project ? project.name : 'Dự án không tồn tại';
+        projectTitle.textContent = project ? project.projectName : 'Dự án không tồn tại';
         projectDescription.textContent = project ? project.description || 'Không có mô tả' : 'Không có mô tả';
     } else {
         console.error("Không tìm thấy phần tử .project-title hoặc .project-description trong DOM");

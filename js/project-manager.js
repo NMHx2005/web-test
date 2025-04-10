@@ -184,12 +184,12 @@ function renderPagination(totalItems) {
 // Modal Functions
 function showModal(modal) {
     modal.style.display = 'block';
-    document.querySelector('.overlay').style.display = 'block';
+    document.querySelector('#overlay').classList.add('active');
 }
 
 function hideModal(modal) {
     modal.style.display = 'none';
-    document.querySelector('.overlay').style.display = 'none';
+    document.querySelector('#overlay').classList.remove('active');
 }
 
 // Project CRUD Functions
