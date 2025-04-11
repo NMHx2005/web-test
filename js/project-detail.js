@@ -191,19 +191,17 @@ function renderMembers() {
             </div>
         `).join('');
         
-        // Thêm nút "Xem thêm" nếu có nhiều hơn 3 thành viên
-        if (currentProject.members.length > 3) {
-            memberList.innerHTML += `
-                <div class="list__member">
-                    <img alt="" src="../assets/images/icon_ba_cham.png" />
-                </div>
-            `;
-            
-            const listMemberBtn = document.querySelector('.list__member');
-            if (listMemberBtn) {
-                listMemberBtn.removeEventListener('click', showMemberListModal);
-                listMemberBtn.addEventListener('click', showMemberListModal);
-            }
+        // Luôn hiển thị nút 3 chấm
+        memberList.innerHTML += `
+            <div class="list__member">
+                <img alt="" src="../assets/images/icon_ba_cham.png" />
+            </div>
+        `;
+        
+        const listMemberBtn = document.querySelector('.list__member');
+        if (listMemberBtn) {
+            listMemberBtn.removeEventListener('click', showMemberListModal);
+            listMemberBtn.addEventListener('click', showMemberListModal);
         }
     }
 }
@@ -212,6 +210,11 @@ function showMemberModal() {
     if (memberModal) {
         memberModal.style.display = 'block';
         overlay.classList.add('active');
+        
+        // Đảm bảo trường email được enable khi thêm thành viên mới
+        const emailInput = document.getElementById('member-email');
+        emailInput.disabled = false;
+        
         memberModal.querySelector('.modal__member-header h2').textContent = 'Thêm thành viên';
     }
 }
@@ -220,6 +223,11 @@ function hideMemberModal() {
     if (memberModal) {
         memberModal.style.display = 'none';
         overlay.classList.remove('active');
+        
+        // Enable lại trường email
+        const emailInput = document.getElementById('member-email');
+        emailInput.disabled = false;
+        
         memberForm.reset();
         memberForm.removeAttribute('data-edit-index');
     }
@@ -289,8 +297,16 @@ function hideMemberListModal() {
 function editMember(index) {
     const member = currentProject.members[index];
     
+    // Tìm email của thành viên từ danh sách users
+    const users = JSON.parse(localStorage.getItem('users') || '[]');
+    const user = users.find(u => u.id === member.userId);
+    const memberEmail = user ? user.email : '';
+    
     // Populate form with member data
-    document.getElementById('member-name').value = member.name;
+    const emailInput = document.getElementById('member-email');
+    emailInput.value = memberEmail;
+    emailInput.disabled = true; // Disable trường email khi sửa
+    
     document.getElementById('member-role').value = member.role;
     
     // Set edit index
@@ -335,56 +351,46 @@ function deleteMember(index) {
 function handleMemberSubmit(e) {
     e.preventDefault();
     
-    const memberName = document.getElementById('member-name').value.trim();
+    const memberEmail = document.getElementById('member-email').value.trim();
     const memberRole = document.getElementById('member-role').value.trim();
     
-    // Validate member name
-    if (!memberName) {
-        showNotification('Tên thành viên không được để trống!', 'error');
-        document.getElementById('member-name').classList.add('error');
+    // Validate email
+    if (!memberEmail) {
+        alert('Email không được để trống!');
         return;
     }
     
-    // Validate member role
+    if (memberEmail.length < EMAIL_MIN_LENGTH) {
+        alert(`Email phải có ít nhất ${EMAIL_MIN_LENGTH} ký tự!`);
+        return;
+    }
+    
+    if (memberEmail.length > EMAIL_MAX_LENGTH) {
+        alert(`Email không được vượt quá ${EMAIL_MAX_LENGTH} ký tự!`);
+        return;
+    }
+    
+    if (!EMAIL_REGEX.test(memberEmail)) {
+        alert('Email không hợp lệ!');
+        return;
+    }
+    
+    // Validate role
     if (!memberRole) {
-        showNotification('Vai trò không được để trống!', 'error');
-        document.getElementById('member-role').classList.add('error');
+        alert('Vai trò không được để trống!');
         return;
     }
     
     if (memberRole.length < ROLE_MIN_LENGTH) {
-        showNotification(`Vai trò phải có ít nhất ${ROLE_MIN_LENGTH} ký tự!`, 'error');
-        document.getElementById('member-role').classList.add('error');
+        alert(`Vai trò phải có ít nhất ${ROLE_MIN_LENGTH} ký tự!`);
         return;
     }
     
     if (memberRole.length > ROLE_MAX_LENGTH) {
-        showNotification(`Vai trò không được vượt quá ${ROLE_MAX_LENGTH} ký tự!`, 'error');
-        document.getElementById('member-role').classList.add('error');
+        alert(`Vai trò không được vượt quá ${ROLE_MAX_LENGTH} ký tự!`);
         return;
     }
     
-    // Get users from localStorage
-    const users = JSON.parse(localStorage.getItem('users') || '[]');
-    
-    // Find user by name
-    const user = users.find(u => u.name === memberName);
-    
-    if (!user) {
-        showNotification('Người dùng không tồn tại!', 'error');
-        document.getElementById('member-name').classList.add('error');
-        return;
-    }
-    
-    // Check if member already exists
-    const memberExists = currentProject.members.some(m => m.userId === user.id);
-    
-    if (memberExists) {
-        showNotification('Thành viên đã tồn tại trong dự án!', 'error');
-        document.getElementById('member-name').classList.add('error');
-                return;
-            }
-            
     // Check if editing or adding
     const editIndex = memberForm.getAttribute('data-edit-index');
     
@@ -395,13 +401,30 @@ function handleMemberSubmit(e) {
         showNotification('Cập nhật thành viên thành công!', 'success');
     } else {
         // Add new member
-            const newMember = {
+        // Tìm user từ email
+        const users = JSON.parse(localStorage.getItem('users') || '[]');
+        const user = users.find(u => u.email === memberEmail);
+        
+        if (!user) {
+            alert('Không tìm thấy người dùng với email này!');
+            return;
+        }
+        
+        // Kiểm tra xem thành viên đã tồn tại trong dự án chưa
+        const memberExists = currentProject.members.some(m => m.userId === user.id);
+        
+        if (memberExists) {
+            alert('Thành viên đã tồn tại trong dự án!');
+            return;
+        }
+        
+        const newMember = {
             userId: user.id,
             name: user.name,
-                role: memberRole
-            };
-            
-            currentProject.members.push(newMember);
+            role: memberRole
+        };
+        
+        currentProject.members.push(newMember);
         showNotification('Thêm thành viên thành công!', 'success');
     }
     
@@ -411,15 +434,15 @@ function handleMemberSubmit(e) {
     
     if (projectIndex !== -1) {
         projects[projectIndex] = currentProject;
-            localStorage.setItem('projects', JSON.stringify(projects));
+        localStorage.setItem('projects', JSON.stringify(projects));
     }
     
     // Reset form and hide modal
     memberForm.reset();
     hideMemberModal();
-            
+    
     // Reload members
-            renderMembers();
+    renderMembers();
     
     // Update assignee select
     populateAssigneeSelect();
